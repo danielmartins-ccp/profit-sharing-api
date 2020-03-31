@@ -13,9 +13,6 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: [3.7, 3.8]
     steps:
     - uses: actions/checkout@master
     - name: Install
@@ -25,10 +22,17 @@ jobs:
         poetry_version: 1.0.5
         working_directory: ./profit_calc # Optional, defaults to '.'
         args: install
+    - name: Lint
+      uses: abatilo/actions-poetry@v1.5.0
+      with:
+        python_version: 3.8.0
+        poetry_version: 1.0.5
+        working_directory: ./profit_calc # Optional, defaults to '.'
+        args: run python -m flake8
     - name: Run pytest
       uses: abatilo/actions-poetry@v1.5.0
       with:
         python_version: 3.8.0
-        poetry_version: 0.12.17
-        working_directory: ./working_dir
-        args: run python -m pytest --cov=profit_calc --cov-branch --cov-fail-under=100 tests/
+        poetry_version: 1.0.5
+        working_directory: ./profit_calc
+        args: run python -m pytest tests/

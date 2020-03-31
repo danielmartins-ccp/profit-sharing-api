@@ -1,7 +1,6 @@
 import pytest
 from assertpy import assert_that
 
-from profit_calc import __version__
 from profit_calc.bags import Weight
 from profit_calc.calculation import profit_calculation
 from profit_calc.specifications import (
