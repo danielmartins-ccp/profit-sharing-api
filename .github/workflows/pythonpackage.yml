@@ -1,0 +1,34 @@
+# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+name: Python package
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.7, 3.8]
+    steps:
+    - uses: actions/checkout@master
+    - name: Install
+      uses: abatilo/actions-poetry@v1.5.0
+      with:
+        python_version: 3.8.0
+        poetry_version: 1.0.5
+        working_directory: ./profit_calc # Optional, defaults to '.'
+        args: install
+    - name: Run pytest
+      uses: abatilo/actions-poetry@v1.5.0
+      with:
+        python_version: 3.8.0
+        poetry_version: 0.12.17
+        working_directory: ./working_dir
+        args: run python -m pytest --cov=profit_calc --cov-branch --cov-fail-under=100 tests/
