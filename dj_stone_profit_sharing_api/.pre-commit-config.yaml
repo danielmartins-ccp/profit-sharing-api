@@ -16,5 +16,5 @@ repos:
         entry: flake8
         language: python
         types: [python]
-        args: ['--config=setup.cfg']
+        args: ['--config=dj_stone_profit_sharing_api/setup.cfg']
 

@@ -2,7 +2,6 @@ import logging
 
 from profit_calc.bags import Weight
 
-
 logger = logging.getLogger(__name__)
 
 
