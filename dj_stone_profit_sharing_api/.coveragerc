@@ -1,0 +1,5 @@
+[run]
+include = dj_stone_profit_sharing_api/*
+omit = *migrations*, *tests*
+plugins =
+    django_coverage_plugin
