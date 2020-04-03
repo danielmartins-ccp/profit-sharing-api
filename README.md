@@ -9,9 +9,10 @@ Este repositório contém o código fontedo projeto de API para cálculo de part
 
 O repositório está distribuído em diferentes pastas para melhor organização, segue abaixo descrição das pastas:
 
-  * [profit_calc](./profict_calc/README.md): contém um pacote reutilizavél que contém o motor de regras e o calculo de distribuição; 
-  * [dj_stone_profit_sharing_api](./dj_stone_profit_sharing_api/README.md): contém uma aplicação completa de API Rest + Persistência feita principalmente com Django + DRF
+  * [profit_calc](./profit_calc/README.rst): contém um pacote reutilizavél do motor de regras e o calculo de distribuição; 
+  * [dj_stone_profit_sharing_api](./dj_stone_profit_sharing_api/README.rst): contém uma aplicação completa de API Rest + Persistência feita principalmente com Django + DRF. 
 
+Cada pasta possui internamente maiores detalhes de funcionamento. 
 
 
 ## Para executar a aplicação (para os apressados)
