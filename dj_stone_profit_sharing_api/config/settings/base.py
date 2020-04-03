@@ -1,6 +1,8 @@
+# flake8: noqa
 """
 Base settings to build other settings files upon.
 """
+import os
 from pathlib import Path
 
 import environ
@@ -70,10 +72,12 @@ THIRD_PARTY_APPS = [
     "allauth.socialaccount",
     "rest_framework",
     "rest_framework.authtoken",
+    "drf_yasg",
 ]
 
 LOCAL_APPS = [
     "dj_stone_profit_sharing_api.users.apps.UsersConfig",
+    "profit_sharing.apps.ProfitSharingConfig",
     # Your stuff: custom apps go here
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
@@ -248,7 +252,14 @@ LOGGING = {
             "formatter": "verbose",
         }
     },
-    "root": {"level": "INFO", "handlers": ["console"]},
+    "root": {"level": "DEBUG", "handlers": ["console"]},
+    "loggers": {
+        "django": {
+            "handlers": ["console"],
+            "level": os.getenv("DJANGO_LOG_LEVEL", "INFO"),
+            "propagate": False,
+        },
+    },
 }
 
 
@@ -264,7 +275,9 @@ ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 # https://django-allauth.readthedocs.io/en/latest/configuration.html
 ACCOUNT_ADAPTER = "dj_stone_profit_sharing_api.users.adapters.AccountAdapter"
 # https://django-allauth.readthedocs.io/en/latest/configuration.html
-SOCIALACCOUNT_ADAPTER = "dj_stone_profit_sharing_api.users.adapters.SocialAccountAdapter"
+SOCIALACCOUNT_ADAPTER = (
+    "dj_stone_profit_sharing_api.users.adapters.SocialAccountAdapter"
+)
 
 # django-reset-framework
 # -------------------------------------------------------------------------------

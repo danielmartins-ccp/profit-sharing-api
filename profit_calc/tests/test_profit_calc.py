@@ -1,21 +1,21 @@
 import pytest
-from assertpy import assert_that
 
+from assertpy import assert_that
 from profit_calc.bags import Weight
 from profit_calc.calculation import profit_calculation
 from profit_calc.specifications import (
-    DirectorBoard,
     AccountingDepartment,
-    FinancialDepartment,
-    ITDepartment,
-    FacilitiesDepartment,
-    CustomerExperienceDepartment,
-    SalaryGreaterThan,
-    SalaryBetween,
-    SalaryLessThan,
-    AdmissionTimeInYearsLessThan,
     AdmissionTimeInYearsBetween,
     AdmissionTimeInYearsGreaterThan,
+    AdmissionTimeInYearsLessThan,
+    CustomerExperienceDepartment,
+    DirectorBoard,
+    FacilitiesDepartment,
+    FinancialDepartment,
+    ITDepartment,
+    SalaryBetween,
+    SalaryGreaterThan,
+    SalaryLessThan,
     Trainee,
 )
 
@@ -212,6 +212,6 @@ def test_profit_calculation(users_from_director_board_department):
 
     for specification, weights in board_rules.items():
         if specification.is_satisfied_by(user_data):
-            assert_that(profit_calculation(user_data, weights)).is_equal_to(
-                expected_profit
-            )
+            assert_that(
+                profit_calculation(user_data["salario_bruto"], weights)
+            ).is_equal_to(expected_profit)
