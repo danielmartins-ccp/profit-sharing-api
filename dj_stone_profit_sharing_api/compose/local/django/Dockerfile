@@ -1,4 +1,4 @@
-FROM python:3.7-slim-buster
+FROM python:3.8-slim-buster
 
 ENV PYTHONUNBUFFERED 1
 ENV PYTHONDONTWRITEBYTECODE 1
@@ -16,6 +16,7 @@ RUN apt-get update \
 
 # Requirements are installed here to ensure they will be cached.
 COPY ./requirements /requirements
+COPY ./custom_packages ./custom_packages
 RUN pip install -r /requirements/local.txt
 
 COPY ./compose/production/django/entrypoint /entrypoint

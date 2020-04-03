@@ -5,8 +5,33 @@ from assertpy import assert_that
 from jsonschema import validate
 from model_bakery import baker
 from profit_sharing.models import Department, Employee
-from profit_sharing.serializers import DepartmentSerializer, EmployeeSerializer
+from profit_sharing.serializers import (
+    DepartmentSerializer,
+    EmployeeSerializer,
+    ProfitDistributionSerializer,
+)
 from rest_framework.parsers import JSONParser
+
+
+@pytest.mark.django_db
+def test_profit_dist_deserialization(schema_loader):
+    # GIVEN
+    stream = io.BytesIO(
+        b"""
+        {
+            "amount": 1000000.00
+        }
+    """
+    )
+
+    # WHEN
+    data = JSONParser().parse(stream)
+    serializer = ProfitDistributionSerializer(data=data)
+    serializer.is_valid()
+
+    # THEN
+    assert_that(serializer.validated_data).contains_key("amount")
+    assert_that(serializer.validated_data["amount"]).is_equal_to(1000000.0)
 
 
 @pytest.mark.django_db
@@ -95,3 +120,23 @@ def test_employee_deserialization(schema_loader):
         "registration_number",
         "position",
     )
+
+
+@pytest.mark.django_db
+def test_profit_distribution_deserialization(schema_loader):
+    # GIVEN
+    stream = io.BytesIO(
+        b"""
+        {
+            "valor_para_distribuicao": 1000000.00
+        }
+    """
+    )
+
+    # WHEN
+    data = JSONParser().parse(stream)
+    serializer = ProfitDistributionSerializer(data=data)
+    serializer.is_valid()
+
+    # THEN
+    assert_that(dict(serializer.validated_data)).contains_key("amount")

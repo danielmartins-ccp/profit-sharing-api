@@ -1,4 +1,7 @@
+from decimal import Decimal
+
 from django.db import models
+from profit_calc.calculation import profit_calculation
 from profit_sharing.managers import EmployeeQuerySet
 
 
@@ -28,3 +31,17 @@ class Employee(Timestampable, models.Model):
 
     def __str__(self):
         return f"[{self.registration_number}] {self.name}"
+
+    def as_dict(self):
+        return {
+            "nome": self.name,
+            "data_de_admissao": self.admission_date.isoformat(),
+            "salario_bruto": float(self.raw_salary),
+            "area": self.department.name,
+            "cargo": self.position,
+        }
+
+    def profit_calculation(self, weights):
+        return round(
+            Decimal.from_float(profit_calculation(float(self.raw_salary), weights)), 2
+        )
