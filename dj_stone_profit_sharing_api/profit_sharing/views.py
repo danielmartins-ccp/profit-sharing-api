@@ -2,11 +2,11 @@ from drf_yasg.utils import swagger_auto_schema
 from profit_sharing.models import Department, Employee
 from profit_sharing.serializers import (
     DepartmentSerializer,
-    EmployeeProfitCaculatedSerializer,
+    DistributedProfitResponseSerializer,
+    DistributionPayloadSerializer,
+    EmployeeProfitSerializer,
     EmployeeSerializer,
-    ProfitDistributionSerializer,
 )
-from profit_sharing.specifications import specifications
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -24,41 +24,21 @@ class EmployeeViewSet(ModelViewSet):
 
 
 class ProfitDistributionView(APIView):
-    @staticmethod
-    def build_serializer(employee):
-        for spec, weights in specifications.items():
-            if spec.is_satisfied_by(employee.as_dict()):
-                return EmployeeProfitCaculatedSerializer(
-                    instance=employee, calculation_weight=weights
-                )
-        return EmployeeProfitCaculatedSerializer(instance=employee)
-
-    @swagger_auto_schema(request_body=ProfitDistributionSerializer())
+    @swagger_auto_schema(request_body=DistributionPayloadSerializer())
     def post(self, request: Request, format=None):
 
-        serializer = ProfitDistributionSerializer(data=request.data)
+        serializer = DistributionPayloadSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-
         employees = Employee.people.select_related("department").all()
 
-        employees_calculations = [
-            self.build_serializer(instance).data for instance in employees
-        ]
-
-        distributed_sum = sum(
-            [
-                participation["valor_da_participação"]
-                for participation in employees_calculations
-            ]
+        result = DistributedProfitResponseSerializer(
+            data={
+                "participacoes": [
+                    EmployeeProfitSerializer(instance).data for instance in employees
+                ],
+                "total_de_funcionarios": employees.count(),
+                "total_disponibilizado": serializer.validated_data["amount"],
+            }
         )
-
-        available = serializer.validated_data["amount"] - distributed_sum
-
-        result = {
-            "participacoes": employees_calculations,
-            "total_de_funcionarios": employees.count(),
-            "total_distribuido": distributed_sum,
-            "total_disponibilizado": serializer.validated_data["amount"],
-            "saldo_total_disponibilizado": available,
-        }
-        return Response(result, content_type="application/json")
+        result.is_valid(raise_exception=True)
+        return Response(result.data, content_type="application/json",)

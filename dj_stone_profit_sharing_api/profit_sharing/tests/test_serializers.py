@@ -7,8 +7,8 @@ from model_bakery import baker
 from profit_sharing.models import Department, Employee
 from profit_sharing.serializers import (
     DepartmentSerializer,
+    DistributionPayloadSerializer,
     EmployeeSerializer,
-    ProfitDistributionSerializer,
 )
 from rest_framework.parsers import JSONParser
 
@@ -26,7 +26,7 @@ def test_profit_dist_deserialization(schema_loader):
 
     # WHEN
     data = JSONParser().parse(stream)
-    serializer = ProfitDistributionSerializer(data=data)
+    serializer = DistributionPayloadSerializer(data=data)
     serializer.is_valid()
 
     # THEN
@@ -135,7 +135,7 @@ def test_profit_distribution_deserialization(schema_loader):
 
     # WHEN
     data = JSONParser().parse(stream)
-    serializer = ProfitDistributionSerializer(data=data)
+    serializer = DistributionPayloadSerializer(data=data)
     serializer.is_valid()
 
     # THEN
