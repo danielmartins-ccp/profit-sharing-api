@@ -7,6 +7,7 @@ from profit_sharing.serializers import (
     EmployeeProfitSerializer,
     EmployeeSerializer,
 )
+from rest_framework.permissions import AllowAny
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -24,6 +25,9 @@ class EmployeeViewSet(ModelViewSet):
 
 
 class ProfitDistributionView(APIView):
+    authentication_classes = ()
+    permission_classes = [AllowAny]
+
     @swagger_auto_schema(request_body=DistributionPayloadSerializer())
     def post(self, request: Request, format=None):
 

@@ -19,7 +19,7 @@ def test_profit_dist_deserialization(schema_loader):
     stream = io.BytesIO(
         b"""
         {
-            "amount": 1000000.00
+            "valor_para_distribuicao": 1000000.00
         }
     """
     )

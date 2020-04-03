@@ -2,6 +2,7 @@ import json
 from os.path import dirname, exists
 
 import pytest
+from rest_framework.test import APIRequestFactory
 
 
 @pytest.fixture
@@ -14,3 +15,8 @@ def schema_loader():
             return json.loads(json_file.read())
 
     return loader
+
+
+@pytest.fixture
+def api_rf():
+    return APIRequestFactory()

@@ -1,18 +1,17 @@
 import pytest
 from assertpy import assert_that
-from django.test import RequestFactory
 from profit_sharing.views import ProfitDistributionView
 
 
 @pytest.mark.django_db
-def test_profit_calculation_base_contract(rf: RequestFactory):
+def test_profit_calculation_base_contract(api_rf):
     # GIVEN
-    view = ProfitDistributionView()
-    payload = {"valor_para_distribuir": 1000000}
-    request = rf.post("/calculate", data=payload, content_type="application/json")
+    view = ProfitDistributionView().as_view()
+    payload = {"valor_para_distribuicao": 1000000.00}
+    request = api_rf.post("/calculate", data=payload, format="json")
 
     # WHEN
-    response = view.post(request)
+    response = view(request)
 
     # THEN
     assert_that(response.data).is_not_none()
@@ -27,14 +26,14 @@ def test_profit_calculation_base_contract(rf: RequestFactory):
 
 
 @pytest.mark.django_db
-def test_profit_calculation(rf: RequestFactory):
+def test_profit_calculation(api_rf):
     # GIVEN
-    view = ProfitDistributionView()
-    payload = {"valor_para_distribuir": 1000000}
-    request = rf.post("/calculate", data=payload, content_type="application/json")
+    view = ProfitDistributionView().as_view()
+    payload = {"valor_para_distribuicao": 1000000.00}
+    request = api_rf.post("/calculate", data=payload, format="json")
 
     # WHEN
-    response = view.post(request)
+    response = view(request)
 
     # THEN
     assert_that(response.data).is_not_none()
