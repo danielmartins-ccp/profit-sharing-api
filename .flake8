@@ -1,0 +1,12 @@
+[flake8]
+ignore = E203, E501, W503
+select = C,E,F,W,B,B950
+max-line-length = 80
+exclude =
+    .git,
+    __pycache__,
+    docs/source/conf.py,
+    old,
+    build,
+    dist
+max-complexity = 10
