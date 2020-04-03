@@ -216,7 +216,7 @@ class AdmissionTimeInYearsGreaterThan(Specification):
 
     def is_satisfied_by(self, candidate):
         admission = pendulum.parse(candidate["data_de_admissao"])
-        return admission.diff(self._frozen).in_years() > self._threshold
+        return admission.diff(self._frozen).in_years() >= self._threshold
 
 
 class AdmissionTimeInYearsBetween(Specification):

@@ -1,11 +1,12 @@
 [flake8]
-ignore = E203, E501, W503
+ignore = E203, E501, W503, I002
 select = C,E,F,W,B,B950
-max-line-length = 80
+max-line-length = 88
 exclude =
     .git,
     __pycache__,
     docs/source/conf.py,
+    docs,
     old,
     build,
     dist
