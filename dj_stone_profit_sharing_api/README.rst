@@ -1,102 +1,81 @@
 Profit Sharing API
 ==================
-
-Desafio - Distribuição dos Lucros
-
-.. image:: https://img.shields.io/badge/built%20with-Cookiecutter%20Django-ff69b4.svg
-     :target: https://github.com/pydanny/cookiecutter-django/
-     :alt: Built with Cookiecutter Django
-.. image:: https://img.shields.io/badge/code%20style-black-000000.svg
-     :target: https://github.com/ambv/black
-     :alt: Black code style
-
-
 :License: GPLv3
 
 
-Settings
---------
+Distribuição dos Lucros
+-----------------------
 
-Moved to settings_.
+Este projeto visa ser uma API REST para o cálculo de participação de lucros de acordo com regras específicas.
 
-.. _settings: http://cookiecutter-django.readthedocs.io/en/latest/settings.html
-
-Basic Commands
---------------
-
-Setting Up Your Users
-^^^^^^^^^^^^^^^^^^^^^
-
-* To create a **normal user account**, just go to Sign Up and fill out the form. Once you submit it, you'll see a "Verify Your E-mail Address" page. Go to your console to see a simulated email verification message. Copy the link into your browser. Now the user's email should be verified and ready to go.
-
-* To create an **superuser account**, use this command::
-
-    $ python manage.py createsuperuser
-
-For convenience, you can keep your normal user logged in on Chrome and your superuser logged in on Firefox (or similar), so that you can see how the site behaves for both kinds of users.
-
-Type checks
-^^^^^^^^^^^
-
-Running type checks with mypy:
-
-::
-
-  $ mypy dj_stone_profit_sharing_api
-
-Test coverage
-^^^^^^^^^^^^^
-
-To run the tests, check your test coverage, and generate an HTML coverage report::
-
-    $ coverage run -m pytest
-    $ coverage html
-    $ open htmlcov/index.html
-
-Running tests with py.test
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-::
-
-  $ pytest
-
-Live reloading and Sass CSS compilation
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Moved to `Live reloading and SASS compilation`_.
-
-.. _`Live reloading and SASS compilation`: http://cookiecutter-django.readthedocs.io/en/latest/live-reloading-and-sass-compilation.html
-
-
-
-
-Email Server
-^^^^^^^^^^^^
-
-In development, it is often nice to be able to see emails that are being sent from your application. For that reason local SMTP server `MailHog`_ with a web interface is available as docker container.
-
-Container mailhog will start automatically when you will run all docker containers.
-Please check `cookiecutter-django Docker documentation`_ for more details how to start all containers.
-
-With MailHog running, to view messages that are sent by your application, open your browser and go to ``http://127.0.0.1:8025``
-
-.. _mailhog: https://github.com/mailhog/MailHog
-
-
-
-Deployment
-----------
-
-The following details how to deploy this application.
-
-
-
-Docker
+Regras
 ^^^^^^
 
-See detailed `cookiecutter-django Docker documentation`_.
+* Foi estabelecido um peso por área de atuação:
 
-.. _`cookiecutter-django Docker documentation`: http://cookiecutter-django.readthedocs.io/en/latest/deployment-with-docker.html
+  * Peso 1: Diretoria;
+  * Peso 2: Contabilidade, Financeiro, Tecnologia;
+  * Peso 3: Serviços Gerais;
+  * Peso 5: Relacionamento com o Cliente;
+
+* Foi estabelecido um peso por faixa salarial e uma exceção para estagiários:
+
+  * Peso 5: Acima de 8 salários mínimos;
+  * Peso 3: Acima de 5 salários mínimos e menor que 8 salários mínimos;
+  * Peso 2: Acima de 3 salários mínimos e menor que 5 salários mínimos;
+  * Peso 1: Todos os estagiários e funcionários que ganham até 3 salários mínimos;
+
+* Foi estabelecido um peso por tempo de admissão:
+
+  * Peso 1: Até 1 ano de casa;
+  * Peso 2: Mais de 1 ano e menos de 3 anos;
+  * Peso 3: Acima de 3 anos e menos de 8 anos;
+  * Peso 5: Mais de 8 anos
 
 
 
+Decisões
+--------
+Para o desenvolvimento deste projeto algumas divisões foram realizadas.
+
+Decisão 1
+^^^^^^^^^
+Separação em 2 pacotes principais
+  * API REST
+  * Pacote de cálculo de distribuição e motor de especificação de regras.
+
+Decisão 2
+^^^^^^^^^
+Arredondamento de valores para BAIXO: Diante da necessidade de arredondamento dos valores calculos, é realizada o arredondamento para BAIXO, para evitar extrapolar o valor alvo.
+
+
+Organização do código
+---------------------
+
+Esta aplicação tradicional Django +  DRF
+
+Aplicação principal se encontra dentro da pasta profit_sharing/:
+
+  * `specifications.py <dj_stone_profit_sharing_api/profit_sharing/specifications.py>`_: Contém todas as especificações das regras (essas especificações usam o pacote `profit_calc <https://github.com/danielmartins-ccp/profit-sharing-api/blob/master/profit_calc/profit_calc/specifications.py>`_
+  * `views.py <dj_stone_profit_sharing_api/profit_sharing/views.py>`_ : Contém os controladores dos endpoints
+  * `models.py <dj_stone_profit_sharing_api/profit_sharing/models.py>`_: Persistência + Integração com profit_calc
+
+
+Testes
+^^^^^^
+
+Cobertura
+~~~~~~~~~
+
+Para executar os testes, gere o report HTML::
+
+    $ docker-compose -f local.yml run django coverage run -m pytest
+    $ docker-compose -f local.yml run django coverage html
+    $ google-chrome htmlcov/index.html
+
+Executando testes com  py.test
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+::
+
+  $ docker-compose -f local.yml run django pytest
