@@ -56,9 +56,9 @@ Esta aplicação tradicional Django +  DRF
 
 Aplicação principal se encontra dentro da pasta profit_sharing/:
 
-  * `specifications.py <dj_stone_profit_sharing_api/profit_sharing/specifications.py>`_: Contém todas as especificações das regras (essas especificações usam o pacote `profit_calc <https://github.com/danielmartins-ccp/profit-sharing-api/blob/master/profit_calc/profit_calc/specifications.py>`_
-  * `views.py <dj_stone_profit_sharing_api/profit_sharing/views.py>`_ : Contém os controladores dos endpoints
-  * `models.py <dj_stone_profit_sharing_api/profit_sharing/models.py>`_: Persistência + Integração com profit_calc
+  * `specifications.py <https://github.com/danielmartins-ccp/profit-sharing-api/blob/master/dj_stone_profit_sharing_api/profit_sharing/specifications.py>`_: Contém todas as especificações das regras (essas especificações usam o pacote `profit_calc <https://github.com/danielmartins-ccp/profit-sharing-api/blob/master/profit_calc/profit_calc/specifications.py>`_
+  * `views.py <https://github.com/danielmartins-ccp/profit-sharing-api/blob/master/dj_stone_profit_sharing_api/profit_sharing/views.py>`_ : Contém os controladores dos endpoints
+  * `models.py <https://github.com/danielmartins-ccp/profit-sharing-api/blob/master/dj_stone_profit_sharing_api/profit_sharing/models.py>`_: Persistência + Integração com profit_calc
 
 
 Testes
