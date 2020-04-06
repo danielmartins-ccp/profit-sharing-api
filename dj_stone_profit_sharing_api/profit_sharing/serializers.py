@@ -12,25 +12,11 @@ class DepartmentSerializer(ModelSerializer):
 
 
 class EmployeeSerializer(ModelSerializer):
+    specification = fields.CharField(source="get_specification", read_only=True)
+
     class Meta:
         model = Employee
         fields = "__all__"
-
-
-class EmployeeProfitSerializer(ModelSerializer):
-    matricula = fields.CharField(source="registration_number")
-    nome = fields.CharField(source="name")
-    valor_da_participação = fields.DecimalField(
-        source="profit_calculation",
-        max_digits=10,
-        decimal_places=2,
-        rounding=decimal.ROUND_UP,
-        coerce_to_string=True,
-    )
-
-    class Meta:
-        model = Employee
-        fields = ["matricula", "nome", "valor_da_participação"]
 
 
 class DistributionPayloadSerializer(Serializer):
@@ -39,8 +25,19 @@ class DistributionPayloadSerializer(Serializer):
     )
 
 
+class EmployeeProfitResultSerializer(Serializer):
+    matricula = fields.CharField()
+    nome = fields.CharField()
+    valor_da_participação = fields.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        rounding=decimal.ROUND_DOWN,
+        coerce_to_string=True,
+    )
+
+
 class DistributedProfitResponseSerializer(Serializer):
-    participacoes = EmployeeProfitSerializer(many=True)
+    participacoes = EmployeeProfitResultSerializer(many=True)
     total_de_funcionarios = fields.IntegerField()
     total_distribuido = fields.DecimalField(
         max_digits=10,
@@ -59,7 +56,7 @@ class DistributedProfitResponseSerializer(Serializer):
     def validate(self, attrs):
         distributed_sum = sum(
             [
-                participation["profit_calculation"]
+                participation["valor_da_participação"]
                 for participation in attrs["participacoes"]
             ]
         )

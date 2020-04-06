@@ -43,7 +43,7 @@ specifications = {
     & AdmissionTimeInYearsBetween(3, 8): Weight(3, 1, 2),
     DirectorBoard()
     & SalaryBetween(3, 5)
-    & AdmissionTimeInYearsBetween(1, 3): Weight(1, 1, 2),
+    & AdmissionTimeInYearsBetween(1, 3): Weight(2, 1, 2),
     DirectorBoard()
     & SalaryLessThan(3)
     & AdmissionTimeInYearsGreaterThan(8): Weight(5, 1, 1),

@@ -1,8 +1,10 @@
-import pytest
+from decimal import Decimal
 
+import pytest
 from assertpy import assert_that
+
 from profit_calc.bags import Weight
-from profit_calc.calculation import profit_calculation
+from profit_calc.calculation import profit_calculation, proportional_profit_calculation
 from profit_calc.specifications import (
     AccountingDepartment,
     AdmissionTimeInYearsBetween,
@@ -16,7 +18,6 @@ from profit_calc.specifications import (
     SalaryBetween,
     SalaryGreaterThan,
     SalaryLessThan,
-    Trainee,
 )
 
 
@@ -159,55 +160,7 @@ def test_admission_time_year_above_spec(specification, admission_time, expected)
     assert_that(specification.is_satisfied_by(user_data)).is_equal_to(expected)
 
 
-def test_profit_calculation(users_from_director_board_department):
-    board_rules = {
-        DirectorBoard()
-        & SalaryGreaterThan(8)
-        & AdmissionTimeInYearsGreaterThan(8): Weight(5, 1, 5,),
-        DirectorBoard()
-        & SalaryGreaterThan(8)
-        & AdmissionTimeInYearsLessThan(1): Weight(1, 1, 5),
-        DirectorBoard()
-        & SalaryGreaterThan(8)
-        & AdmissionTimeInYearsBetween(3, 8): Weight(3, 1, 5),
-        DirectorBoard()
-        & SalaryGreaterThan(8)
-        & AdmissionTimeInYearsBetween(1, 3): Weight(2, 1, 5),
-        DirectorBoard()
-        & SalaryBetween(5, 8)
-        & AdmissionTimeInYearsGreaterThan(8): Weight(5, 1, 3),
-        DirectorBoard()
-        & SalaryBetween(5, 8)
-        & AdmissionTimeInYearsBetween(3, 8): Weight(3, 1, 3),
-        DirectorBoard()
-        & SalaryBetween(5, 8)
-        & AdmissionTimeInYearsBetween(1, 3): Weight(2, 1, 3),
-        DirectorBoard()
-        & SalaryBetween(5, 8)
-        & AdmissionTimeInYearsLessThan(1): Weight(1, 1, 3),
-        DirectorBoard()
-        & SalaryBetween(3, 5)
-        & AdmissionTimeInYearsGreaterThan(8): Weight(5, 1, 2),
-        DirectorBoard()
-        & SalaryBetween(3, 5)
-        & AdmissionTimeInYearsBetween(3, 8): Weight(3, 1, 2),
-        DirectorBoard()
-        & SalaryBetween(3, 5)
-        & AdmissionTimeInYearsBetween(1, 3): Weight(1, 1, 2),
-        DirectorBoard()
-        & SalaryLessThan(3)
-        & AdmissionTimeInYearsGreaterThan(8): Weight(5, 1, 1),
-        DirectorBoard()
-        & SalaryLessThan(3)
-        & AdmissionTimeInYearsBetween(3, 8): Weight(3, 1, 1),
-        DirectorBoard()
-        & SalaryLessThan(3)
-        & AdmissionTimeInYearsBetween(1, 3): Weight(2, 1, 1),
-        DirectorBoard()
-        & (Trainee() | SalaryLessThan(3))
-        & AdmissionTimeInYearsLessThan(1): Weight(1, 1, 1),
-    }
-
+def test_profit_calculation_unit(board_rules, users_from_director_board_department):
     user_data, expected_profit = users_from_director_board_department
 
     for specification, weights in board_rules.items():
@@ -215,3 +168,59 @@ def test_profit_calculation(users_from_director_board_department):
             assert_that(
                 profit_calculation(user_data["salario_bruto"], weights)
             ).is_equal_to(expected_profit)
+
+
+def test_direct_proportional_division_calculation(
+    board_rules, board_users_distributed_range
+):
+    data = [
+        (
+            {
+                "nome": "S[8+] | T[8+]",  # 11
+                "data_de_admissao": "2000-01-01",
+                "salario_bruto": Decimal("15000.0"),
+                "area": "Diretoria",
+                "cargo": "Diretor Financeiro",
+            },
+            Decimal("3928.54"),
+        ),
+        (
+            {
+                "nome": "S[8+] | T[3<8]",  # 9
+                "data_de_admissao": "2015-01-01",
+                "salario_bruto": Decimal("15000.0"),
+                "area": "Diretoria",
+                "cargo": "Diretor Financeiro",
+            },
+            Decimal("3214.26"),
+        ),
+        (
+            {
+                "nome": "S[8+] | T[1<3]",  # 8
+                "data_de_admissao": "2019-01-01",
+                "salario_bruto": Decimal("15000.0"),
+                "area": "Diretoria",
+                "cargo": "Diretor Financeiro",
+            },
+            Decimal("2857.12"),
+        ),
+    ]
+    amount_to_distribute = Decimal("10000.00")
+
+    def aggregate_weight(user_data) -> Weight:
+        for specification, weight in board_rules.items():
+            if specification.is_satisfied_by(user_data):
+                user_data["weight"] = weight
+                return weight
+        raise ValueError("No specification match this user data")
+
+    weights = [aggregate_weight(user) for user, _ in data]
+
+    profit_sum = Decimal("0")
+    for user, proportional_value_expected in data:
+        value = proportional_profit_calculation(
+            amount_to_distribute, user["weight"], weights
+        )
+        assert_that(value).is_equal_to(proportional_value_expected)
+        profit_sum += value
+    assert_that(profit_sum).is_less_than_or_equal_to(amount_to_distribute)
