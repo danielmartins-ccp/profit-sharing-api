@@ -1,4 +1,18 @@
+from decimal import Decimal
+
 import pytest
+
+from profit_calc.bags import Weight
+from profit_calc.specifications import (
+    DirectorBoard,
+    SalaryGreaterThan,
+    AdmissionTimeInYearsGreaterThan,
+    AdmissionTimeInYearsLessThan,
+    AdmissionTimeInYearsBetween,
+    SalaryBetween,
+    SalaryLessThan,
+    Trainee,
+)
 
 
 def user_data_with_expected_profit():
@@ -219,3 +233,94 @@ def idfn(fixture_value):
 @pytest.fixture(params=user_data_with_expected_profit(), ids=idfn)
 def users_from_director_board_department(request):
     return request.param[0], request.param[1]
+
+
+@pytest.fixture
+def board_rules():
+    return {
+        DirectorBoard()
+        & SalaryGreaterThan(8)
+        & AdmissionTimeInYearsGreaterThan(8): Weight(5, 1, 5,),
+        DirectorBoard()
+        & SalaryGreaterThan(8)
+        & AdmissionTimeInYearsLessThan(1): Weight(1, 1, 5),
+        DirectorBoard()
+        & SalaryGreaterThan(8)
+        & AdmissionTimeInYearsBetween(3, 8): Weight(3, 1, 5),
+        DirectorBoard()
+        & SalaryGreaterThan(8)
+        & AdmissionTimeInYearsBetween(1, 3): Weight(2, 1, 5),
+        DirectorBoard()
+        & SalaryBetween(5, 8)
+        & AdmissionTimeInYearsGreaterThan(8): Weight(5, 1, 3),
+        DirectorBoard()
+        & SalaryBetween(5, 8)
+        & AdmissionTimeInYearsBetween(3, 8): Weight(3, 1, 3),
+        DirectorBoard()
+        & SalaryBetween(5, 8)
+        & AdmissionTimeInYearsBetween(1, 3): Weight(2, 1, 3),
+        DirectorBoard()
+        & SalaryBetween(5, 8)
+        & AdmissionTimeInYearsLessThan(1): Weight(1, 1, 3),
+        DirectorBoard()
+        & SalaryBetween(3, 5)
+        & AdmissionTimeInYearsGreaterThan(8): Weight(5, 1, 2),
+        DirectorBoard()
+        & SalaryBetween(3, 5)
+        & AdmissionTimeInYearsBetween(3, 8): Weight(3, 1, 2),
+        DirectorBoard()
+        & SalaryBetween(3, 5)
+        & AdmissionTimeInYearsBetween(1, 3): Weight(2, 1, 2),
+        DirectorBoard()
+        & SalaryLessThan(3)
+        & AdmissionTimeInYearsGreaterThan(8): Weight(5, 1, 1),
+        DirectorBoard()
+        & SalaryLessThan(3)
+        & AdmissionTimeInYearsBetween(3, 8): Weight(3, 1, 1),
+        DirectorBoard()
+        & SalaryLessThan(3)
+        & AdmissionTimeInYearsBetween(1, 3): Weight(2, 1, 1),
+        DirectorBoard()
+        & (Trainee() | SalaryLessThan(3))
+        & AdmissionTimeInYearsLessThan(1): Weight(1, 1, 1),
+    }
+
+
+@pytest.fixture()
+def board_users_distributed_range():
+    # 357,15
+    return [
+        (
+            Decimal("10000.0"),
+            {
+                "nome": "S[8+] | T[8+]",  # 11
+                "data_de_admissao": "2000-01-01",
+                "salario_bruto": 15000.0,
+                "area": "Diretoria",
+                "cargo": "Diretor Financeiro",
+            },
+            Decimal("3928.54"),
+        ),
+        (
+            Decimal("10000.0"),
+            {
+                "nome": "S[8+] | T[3<8]",  # 9
+                "data_de_admissao": "2015-01-01",
+                "salario_bruto": 15000.0,
+                "area": "Diretoria",
+                "cargo": "Diretor Financeiro",
+            },
+            Decimal("3214.26"),
+        ),
+        (
+            Decimal("10000.0"),
+            {
+                "nome": "S[8+] | T[1<3]",  # 8
+                "data_de_admissao": "2019-01-01",
+                "salario_bruto": 15000.0,
+                "area": "Diretoria",
+                "cargo": "Diretor Financeiro",
+            },
+            Decimal("2857.12"),
+        ),
+    ]

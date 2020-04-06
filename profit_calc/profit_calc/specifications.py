@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 import pendulum
 
 
@@ -31,6 +33,12 @@ class CompositeSpecification(Specification):
 class MultaryCompositeSpecification(CompositeSpecification):
     def __init__(self, *specifications):
         self.specifications = specifications
+
+    def __repr__(self) -> str:
+        repr = f" {self.__class__.__name__.split('.')[-1]} ".join(
+            [str(s) for s in self.specifications]
+        )
+        return repr
 
 
 class And(MultaryCompositeSpecification):
@@ -121,6 +129,9 @@ class FalseSpecification(NullaryCompositeSpecification):
 
 
 class DirectorBoard(Specification):
+    def __repr__(self):
+        return f"{self.__class__.__name__}()"
+
     def is_satisfied_by(self, candidate):
         return candidate["area"].lower() == "diretoria"
 
@@ -156,45 +167,53 @@ class CustomerExperienceDepartment(Specification):
 
 
 class BaseSalaryCalculatorMixin(object):
-    BASE_SALARY: float = 1045.0
+    BASE_SALARY: Decimal = Decimal("1045.0")
+
+    def __init__(self, threshold: int, base: Decimal = None) -> None:
+        self._threshold = threshold
+        if base:
+            if not isinstance(base, Decimal):
+                base = Decimal(base)
+            self.BASE_SALARY = base
 
     def calculate(self, raw_salary):
         return raw_salary / self.BASE_SALARY
 
+    def sanitize(self, raw_salary):
+        if not isinstance(raw_salary, Decimal):
+            raw_salary = Decimal(raw_salary)
+        return raw_salary
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}(threshold={self._threshold})"
+
 
 class SalaryGreaterThan(BaseSalaryCalculatorMixin, Specification):
-    def __init__(self, threshold: int, base: float = None) -> None:
-        super().__init__()
-        self._threshold = threshold
-        if base:
-            self.BASE_SALARY = base
-
     def is_satisfied_by(self, candidate):
-        return self.calculate(candidate["salario_bruto"]) > self._threshold
+        return (
+            self.calculate(self.sanitize(candidate["salario_bruto"])) > self._threshold
+        )
 
 
 class SalaryLessThan(BaseSalaryCalculatorMixin, Specification):
-    def __init__(self, threshold: int, base: float = None) -> None:
-        super().__init__()
-        self._threshold = threshold
-        if base:
-            self.BASE_SALARY = base
-
     def is_satisfied_by(self, candidate):
-        return self.calculate(candidate["salario_bruto"]) < self._threshold
+        return (
+            self.calculate(self.sanitize(candidate["salario_bruto"])) < self._threshold
+        )
 
 
 class SalaryBetween(BaseSalaryCalculatorMixin, Specification):
-    def __init__(self, first: int, second: int, base: float = None) -> None:
-        super().__init__()
+    def __init__(self, first: int, second: int, base: Decimal = None) -> None:
+        super().__init__(threshold=0, base=base)
         self._first = first
         self._second = second
-        if base:
-            self.BASE_SALARY = base
 
     def is_satisfied_by(self, candidate):
-        salaries = self.calculate(candidate["salario_bruto"])
+        salaries = self.calculate(self.sanitize(candidate["salario_bruto"]))
         return self._first <= salaries <= self._second
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}(first={self._first}, second={self._second})"
 
 
 class AdmissionTimeInYearsLessThan(Specification):
@@ -207,6 +226,9 @@ class AdmissionTimeInYearsLessThan(Specification):
         admission = pendulum.parse(candidate["data_de_admissao"])
         return admission.diff(self._frozen).in_years() < self._threshold
 
+    def __repr__(self):
+        return f"{self.__class__.__name__}(threshold={self._threshold}, current_time={self._frozen})"
+
 
 class AdmissionTimeInYearsGreaterThan(Specification):
     def __init__(self, threshold, current_time=None) -> None:
@@ -218,15 +240,23 @@ class AdmissionTimeInYearsGreaterThan(Specification):
         admission = pendulum.parse(candidate["data_de_admissao"])
         return admission.diff(self._frozen).in_years() >= self._threshold
 
+    def __repr__(self):
+        return f"{self.__class__.__name__}(threshold={self._threshold}, current_time={self._frozen})"
+
 
 class AdmissionTimeInYearsBetween(Specification):
+    BASE_DAYS_ON_YEAR = 365
+
     def __init__(self, initial, final, current_time=None) -> None:
         super().__init__()
-        self._initial_threshold = initial
-        self._end_threshold = final
+        self._initial_threshold = initial * self.BASE_DAYS_ON_YEAR
+        self._end_threshold = final * self.BASE_DAYS_ON_YEAR
         self._frozen = pendulum.parse(current_time) if current_time else pendulum.now()
 
     def is_satisfied_by(self, candidate):
         admission = pendulum.parse(candidate["data_de_admissao"])
-        diff_in_years = admission.diff(self._frozen).in_years()
+        diff_in_years = admission.diff(self._frozen).in_days()
         return self._initial_threshold < diff_in_years < self._end_threshold
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}(initial={self._initial_threshold}, final={self._end_threshold})"
