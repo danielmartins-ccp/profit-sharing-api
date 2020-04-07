@@ -7,14 +7,12 @@ from profit_sharing.views import (
 )
 from rest_framework.routers import DefaultRouter, SimpleRouter
 
-from dj_stone_profit_sharing_api.users.api.views import UserViewSet
-
 if settings.DEBUG:
     router = DefaultRouter()
 else:
     router = SimpleRouter()
 
-router.register("users", UserViewSet)
+# router.register("users", UserViewSet)
 router.register("departments", DepartmentViewSet)
 router.register("employees", EmployeeViewSet)
 

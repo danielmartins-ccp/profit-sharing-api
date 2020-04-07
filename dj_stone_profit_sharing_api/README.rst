@@ -8,6 +8,23 @@ Distribuição dos Lucros
 
 Este projeto visa ser uma API REST para o cálculo de participação de lucros de acordo com regras específicas.
 
+Uso
+---
+
+  * Os funcionários podem ser cadastros pelo endpoint /api/employees/ (Requer estar autenticado)
+  * os departamentos podem ser cadastrados pelo endpoint /api/departments/ (Requer estar autenticado)
+  * O calculo pode ser feito pelo endpoint /api/calculate/ (não requer autenticado)
+
+Mecanismo de autenticação padrão é o django-login. 
+
+No swagger existe um botão Django Login, use-o para autenticação.
+
+Criação de usuário
+^^^^^^^^^^^^^^^^^^
+
+    $ docker-compose -f local.yml run django createsuperuser
+
+
 Regras
 ^^^^^^
 
@@ -91,4 +108,5 @@ Possível Roadmap
   * Persistência do cálculo em 2 etapas (dry-run & persist)
   * Expor mecanismo de arredondamento
   * Criar endpoint para composição de regras
+
 
