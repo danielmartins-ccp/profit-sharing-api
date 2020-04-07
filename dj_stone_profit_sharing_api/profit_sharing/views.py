@@ -4,7 +4,6 @@ from profit_sharing.serializers import (
     DepartmentSerializer,
     DistributedProfitResponseSerializer,
     DistributionPayloadSerializer,
-    EmployeeProfitSerializer,
     EmployeeSerializer,
 )
 from rest_framework.permissions import AllowAny
@@ -35,10 +34,19 @@ class ProfitDistributionView(APIView):
         serializer.is_valid(raise_exception=True)
         employees = Employee.people.select_related("department").all()
 
+        weights = [people.get_weight() for people in employees]
+
         result = DistributedProfitResponseSerializer(
             data={
                 "participacoes": [
-                    EmployeeProfitSerializer(instance).data for instance in employees
+                    {
+                        "matricula": instance.registration_number,
+                        "nome": instance.name,
+                        "valor_da_participação": instance.proportional_profit_calculation(
+                            serializer.validated_data["amount"], weights,
+                        ),
+                    }
+                    for instance in employees
                 ],
                 "total_de_funcionarios": employees.count(),
                 "total_disponibilizado": serializer.validated_data["amount"],
