@@ -48,6 +48,10 @@ Decisão 2
 ^^^^^^^^^
 Arredondamento de valores para BAIXO: Diante da necessidade de arredondamento dos valores calculos, é realizada o arredondamento para BAIXO, para evitar extrapolar o valor alvo.
 
+Decisão 3
+^^^^^^^^^
+A API calcula somente em RUNTIME, não faz persistência do cálculo. 
+
 
 Organização do código
 ---------------------
@@ -56,8 +60,7 @@ Esta aplicação tradicional Django +  DRF
 
 Aplicação principal se encontra dentro da pasta profit_sharing/:
 
-  * `specifications.py <https://github.com/danielmartins-ccp/profit-sharing-api/blob/master/dj_stone_profit_sharing_api/profit_sharing/specifications.py>`_: Contém todas as especificações das regras (essas especificações usam o pacote `profit_calc <https://github.com/danielmartins-ccp/profit-sharing-api/blob/master/profit_calc/profit_calc/specifications.py>`_
-  * `views.py <https://github.com/danielmartins-ccp/profit-sharing-api/blob/master/dj_stone_profit_sharing_api/profit_sharing/views.py>`_ : Contém os controladores dos endpoints
+  * `specifications.py <https://github.com/danielmartins-ccp/profit-sharing-api/blob/master/dj_stone_profit_sharing_api/profit_sharing/specifications.py>`_: Contém todas as especificações das regras (essas especificações usam o pacote `profit_calc <https://github.com/danielmartins-ccp/profit-sharing-api/blob/master/profit_calc/profit_calc/specifications.py>`_  * `views.py <https://github.com/danielmartins-ccp/profit-sharing-api/blob/master/dj_stone_profit_sharing_api/profit_sharing/views.py>`_ : Contém os controladores dos endpoints
   * `models.py <https://github.com/danielmartins-ccp/profit-sharing-api/blob/master/dj_stone_profit_sharing_api/profit_sharing/models.py>`_: Persistência + Integração com profit_calc
 
 
@@ -79,3 +82,13 @@ Executando testes com  py.test
 ::
 
   $ docker-compose -f local.yml run django pytest
+
+
+Possível Roadmap
+----------------
+
+  * Dinamizar motor de regras (Talvez uma DSL ?)
+  * Persistência do cálculo em 2 etapas (dry-run & persist)
+  * Expor mecanismo de arredondamento
+  * Criar endpoint para composição de regras
+
