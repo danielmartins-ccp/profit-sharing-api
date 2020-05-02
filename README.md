@@ -17,7 +17,7 @@ Cada pasta possui internamente maiores detalhes de funcionamento.
 
 ## Para executar a aplicação (para os apressados)
 
-![GIF demonstrating base installation](https://gist.githubusercontent.com/danielmartins-ccp/bd014cf5781bfb7e67b3076c01bbffa5/raw/dcfd5bb2e758b52869708e3dceb5953aad9b973f/base_start.gif)
+![GIF demonstrating base installation](https://gist.githubusercontent.com/danielmartins/51252360eaec89fa366940129f635195/raw/58656d080ee3dcda219b6daa24f3893094640faa/base_start.gif)
 
 ### Start
 
